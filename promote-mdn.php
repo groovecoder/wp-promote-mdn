@@ -461,6 +461,7 @@ if ( !class_exists( 'PromoteMDN_Widget' ) ) :
                 'red_html'          => 'promobutton_mdn10.png',
                 'red_javascript'    => 'promobutton_mdn11.png',
                 'red_web'           => 'promobutton_mdn12.png',
+                'blue_web'          => '',
             );
             extract( $args );
             if ( isset( $before_widget ) )
@@ -483,18 +484,38 @@ if ( !class_exists( 'PromoteMDN_Widget' ) ) :
                 'gray'      => __( 'Gray' ),
                 'red'       => __( 'Red' ),
                 'orange'    => __( 'Orange' ),
+                'blue'      => __( 'Blue' ),
             );
-            $texts          = array( 'HTML', 'CSS', 'JavaScript', 'Web' );
+            $texts = array(
+                'HTML',
+                'CSS',
+                'JavaScript',
+                'Web'
+            );
+            $sizes = array(
+                '120x240',
+                '240x240',
+                '240x280'
+            );
             $selected_color = 'grey';
             $selected_text  = 'Web';
+            $selected_size  = '120x240';
+
             if ( isset( $instance['color'] ) )
                 $selected_color = $instance['color'];
+            $color_field_id = $this->get_field_id( 'color' );
+
             if ( isset( $instance['text'] ) )
                 $selected_text = $instance['text'];
+            $text_field_id = $this->get_field_id( 'text' );
+
+            if ( isset( $instance['size'] ) )
+                $selected_size = $instance['size'];
+            $size_field_id = $this->get_field_id( 'size' );
 ?>
     <section>
-        <label for="<?php echo esc_html( $this->get_field_id( 'color' ) ); ?>"><?php _e( 'Color:' ); ?></label>
-        <select id="<?php echo esc_html( $this->get_field_id( 'color' ) ); ?>" name="<?php echo esc_html( $this->get_field_name( 'color' ) ); ?>">
+        <label for="<?php echo esc_html( $color_field_id ); ?>"><?php _e( 'Color:' ); ?></label>
+        <select id="<?php echo esc_html( $color_field_id ); ?>" name="<?php echo esc_html( $this->get_field_name( 'color' ) ); ?>">
 <?php
             foreach ( $colors as $value => $color ) {
                 $selected = ( $value == $selected_color ) ? 'selected' : '';
@@ -504,8 +525,15 @@ if ( !class_exists( 'PromoteMDN_Widget' ) ) :
             }
 ?>
         </select><br/>
-        <label for="<?php echo esc_html( $this->get_field_id( 'text' ) ); ?>"><?php _e( 'Text:' ); ?></label>
-        <select id="<?php echo esc_html( $this->get_field_id( 'text' ) ); ?>" name="<?php echo esc_html( $this->get_field_name( 'text' ) ); ?>">
+        <label for="<?php echo esc_html( $text_field_id ); ?>"><?php _e( 'Text:' ); ?></label>
+<?php
+            $disabled = '';
+            if ( $selected_color == 'blue') {
+                $disabled = 'disabled';
+                $selected_text = 'Web';
+            }
+?>
+        <select id="<?php echo esc_html( $text_field_id ); ?>" name="<?php echo esc_html( $this->get_field_name( 'text' ) ); ?>" <?php echo $disabled ?>>
 <?php
             foreach ( $texts as $text ) {
                 $selected = ( $text == $selected_text ) ? 'selected' : '';
@@ -514,8 +542,41 @@ if ( !class_exists( 'PromoteMDN_Widget' ) ) :
 <?php
             }
 ?>
+        </select><br/>
+        <label for="<?php echo esc_html( $size_field_id ); ?>"><?php _e( 'Size:' ); ?></label>
+<?php
+            $disabled = '';
+            if ( $selected_color !== 'blue') {
+                $disabled = 'disabled';
+                $selected_size = '120x240';
+            }
+?>
+        <select id="<?php echo esc_html( $size_field_id ); ?>" name="<?php echo esc_html( $this->get_field_name( 'size' ) ); ?>" <?php echo $disabled ?>>
+<?php
+            foreach ( $sizes as $size ) {
+                $selected = ( $size == $selected_size ) ? 'selected' : '';
+?>
+            <option value="<?php echo esc_html( $size ) ?>" <?php echo esc_html( $selected ) ?>><?php echo esc_html( $size ) ?></option>
+<?php
+            }
+?>
         </select>
     </section>
+    <script type="text/javascript">
+        var colorSelect = document.getElementById('<?php echo $color_field_id; ?>'),
+            textSelect = document.getElementById('<?php echo $text_field_id; ?>'),
+            sizeSelect = document.getElementById('<?php echo $size_field_id; ?>');
+        colorSelect.addEventListener('change', function(){
+            if (colorSelect.value == 'blue') {
+                textSelect.value = 'Web';
+                textSelect.disabled = true;
+            } else {
+                sizeSelect.value = '120x240';
+                sizeSelect.disabled = true;
+                textSelect.disabled = false;
+            }
+        });
+    </script>
 <?php
         }
 
